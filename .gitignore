@@ -1,0 +1,9 @@
+playground.py
+log/
+*.log
+*.tar
+*.gpkg
+*.json
+venv/
+export_config.json
+callback.py

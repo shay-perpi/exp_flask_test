@@ -1,0 +1,11 @@
+*.gitignore
+*.git
+*.tar
+*.log
+*.json
+/venv
+playground.py
+log/
+*.gpkg
+
+
