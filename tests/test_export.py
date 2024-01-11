@@ -12,13 +12,14 @@ from flask.testing import FlaskClient
 from common.log import LoggerSingleton
 from common.config_file import raster_url, trigger_task_create, token, create_data_export, record_id, foot_print_demi, \
     required_resolution, domain, foot_print_file, ca_file, path_download
-from app import app
 
 logger = LoggerSingleton()
 time_keeper = TimeHandler()
 
 
 def trigger_missing_params():
+    print("Test missing_params")
+
     logger.info(f"Start {trigger_missing_params.__name__}")
     url_export = f"{raster_url}/{trigger_task_create}?token={token}"
     trigger_params = create_data_export(record_id=record_id, foot_prints=foot_print_demi,
@@ -49,6 +50,7 @@ def trigger_missing_params():
 
 
 def trigger_invalid_params():
+    print("invalid_params")
     logger.info(f"Start {trigger_invalid_params.__name__}")
     url_export = f"{raster_url}/{trigger_task_create}?token={token}"
 
@@ -81,6 +83,8 @@ def trigger_invalid_params():
 
 
 def test_demi():
+    print("Test demi")
+
     logger.info("Start Test : ")
 
     trigger_missing_params()
@@ -88,14 +92,20 @@ def test_demi():
 
 
 def send_requests():
+    url_export = f"{raster_url}/{trigger_task_create}"
+
+    print("send requests")
     params = list_of_params_requests()
     for data in params:
         try:
-            req = requests.post(url=raster_url, data=data,
+            req = requests.post(url=url_export, data=data,
                                 headers={"Content-Type": "application/json"})
+            print(f"status: {req.status_code}\n  requets :{req.text} \n requests {req}")
+            # response = json.loads(req.text)
             req.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
-            time_keeper.keep_time_by_id(req.json()["data"]["id"])  # keep the time from the response of the request
-            logger.info(f"Request for {data} successful. Response: {req.text}")
+            request_id = req.json()["id"]
+            time_keeper.keep_time_by_id(request_id)  # keep the time from the response of the request
+            logger.info(f"Request for {request_id} ")
         except requests.exceptions.RequestException as e:
             logger.error(f"Error sending request {data}: {e}")
 
@@ -112,21 +122,6 @@ def list_of_params_requests(export_count=1):
     return list_of_params
 
 
-@pytest.fixture
-def client() -> FlaskClient:
-    with app.test_client() as client:
-        yield client
-
-
-def callback(client):
-    response = client.get('/webhook')
-    print("Fixture")
-    assert response.status_code == 200
-    time_keeper.keep_time_by_id(response.json()['data']['id'])  # keep the time from the callback
-
-    assert b'Hello, World!' in response.data
-
-
 class StopThread(Exception):
     pass
 
@@ -134,12 +129,16 @@ class StopThread(Exception):
 class HandleCallback:
     def __init__(self, response):
         self.params = response
+        self.gpkg_path = None
 
     def __download_product(self, url, file_name):
+        logger.info(f"Start download {file_name}")
         path = f"{path_download}/{file_name}"
         try:
             d = path_download + '/' + file_name
             subprocess.check_call(['wget', '--no-check-certificate', '-O', d, url])
+            logger.info(f"Download {file_name} successfully")
+
             return d
         except Exception as e:  # except StopThread as e:
             logger.error(f"Download operation failed {e}")
@@ -155,15 +154,21 @@ class HandleCallback:
         self.__test_status_api()
         self.__metadata()
         self.__products()
+        self.__delete_file()
+        logger.info("Test end product")
 
     def __test_status_api(self):
-        url_export_status = f"{raster_url}/{trigger_task_create}/{self.params['id']}?token={token}"
+        logger.info(f"Enter test_status_api")
+
+        url_export_status = f"{raster_url}/{trigger_task_create}/{self.params['id']}"  # ?token={token}
         response = requests.get(url=url_export_status, headers={"Content-Type": "application/json"}, verify=False)
         response.raise_for_status()
-        assert response.json()["progress"] == 100
+        print(response.text)
+        assert response.json()["progress"] == 100, logger.error("API progress not correct. ")
+        logger.info(f"End successfully test_status_api")
 
     def __metadata(self):
-        # logger.info(f"Enter {self.metadata.__name__}")
+        logger.info(f"Enter test Metadata")
         assert self.params['artifacts'][1], "No Metadata info in response"
         metadata_request = self.params['artifacts'][1]
         assert metadata_request, logger.error("Not metadata")
@@ -171,24 +176,37 @@ class HandleCallback:
         assert metadata, logger.error("Not JSON in MetaData")
         assert len(metadata.content) == metadata_request['size'], "The Metadata size not much as request data"
         logger.info(str(metadata.content))
-        # logger.info(f"End successfully {self.metadata.__name__}")
+        logger.info(f"End successfully test Metadata")
 
     def __products(self):
-        # logger.info(f"Enter {self.products.__name__}")
+        logger.info(f"Enter tests products")
         assert self.params['artifacts'][0], logger.error("No product info  in response")
         product = self.params['artifacts'][0]
         assert product['url'], logger.error(" No Url in artifacts product")
         assert product['size'], logger.error(" No Size in artifacts product")
         assert product['name'], logger.error(" No Name in artifacts product")
         assert product['type'], logger.error(" No Type in artifacts product")
-        # resp = wget.download(product['url'], out=path_dir)
-        path = self.__download_product(product["url"], product["name"])
-
-        assert path, logger.error(" Response of product download ERROR ")
-        logger.info(str(path))
+        self.gpkg_path = self.__download_product(product["url"], product["name"])
+        print(self.gpkg_path)
+        assert self.gpkg_path, logger.error(" Response of product download ERROR ")
         try:
-            dataset = rasterio.open(path, mode='r')
+            dataset = rasterio.open(self.gpkg_path, mode='r')
         except Exception as E:
             logger.info("Cannot open product: " + str(E))
-        assert os.path.getsize(path) == int(product['size']), logger.error(" Size not match metadata to product")
+        assert os.path.getsize(self.gpkg_path) == int(product['size']), logger.error(" Size not match metadata to product")
+        logger.info(f"End successfully tests products")
 
+    def __delete_file(self):
+        file_path = self.gpkg_path
+        logger.info(f"Enter Delete function with :  {file_path}")
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                # shutil.rmtree(file_path)
+                logger.info(f"File {file_path} deleted successfully.")
+            except PermissionError:
+                logger.error(f"Permission error: Unable to delete {file_path}.")
+            except Exception as e:
+                logger.error(f"An error occurred: {e}")
+        else:
+            logger.error(f"File {file_path} does not exist.")

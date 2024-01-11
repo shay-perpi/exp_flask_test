@@ -7,3 +7,6 @@ log/
 venv/
 export_config.json
 callback.py
+footprints.txt
+download\
+download

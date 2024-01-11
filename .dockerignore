@@ -8,4 +8,6 @@ playground.py
 log/
 *.gpkg
 
-
+footprints.txt
+download\
+download
