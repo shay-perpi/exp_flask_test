@@ -16,13 +16,15 @@ class TimeHandler:
         if self._initialized:
             return
         self.format = format
-        self.start_time = self.get_current_time()  # Store the start time
+        self.start_time = None  # Store the start time
         self.time_memory = {}  # Dictionary to store times by ID
         self._initialized = True
 
     def get_current_time(self):
         current_time = datetime.now()
         return current_time.strftime(self.format)
+    def set_start_time(self):
+        self.start_time =self.get_current_time()
 
     def convert_to_datetime(self, time_string):
         return datetime.strptime(time_string, self.format)

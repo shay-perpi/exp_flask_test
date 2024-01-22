@@ -11,17 +11,7 @@ record_id = os.getenv("record_id", "dcf8f87e-f02d-4b7a-bf7b-c8b64b2d202a")
 trigger_task_create = os.getenv("trigger_task_create", "export-tasks")
 required_resolution = os.getenv("required_resolution", 0.0000013411)
 headers = os.getenv("headers", {"Content-Type": "application/json"})
-export_count = os.getenv("export_count", 3)
-pg_credential = os.getenv("pg_credential") or {
-        "pg_host": "10.0.4.4",
-        "pg_user": "postgres",
-        "pg_port": "5432",
-        "pg_pass": "Libot4allnonprod",
-        "pg_job_task_table": "common-job-manager-q3-1-2023",
-        "pg_pycsw_record_table": "raster-qa",
-        "pg_mapproxy_table": "raster-qa",
-        "pg_agent_table": "raster-qa"
-    }
+export_count = os.getenv("export_count", 8)
 
 foot_print_file = os.getenv("foot_prints_file", "footprints.txt")
 path_dir = os.getenv("path_export_dir_raster")
@@ -32,7 +22,7 @@ path_log = os.getenv("logger_path", None) or "/home/shayperp/PycharmProjects/exp
 logger_name = os.getenv("logger_name", "export-test")
 json_file_path = os.getenv(
     "export_config") or "/home/shayperp/PycharmProjects/pythonProject/export_scadolar_config/scadolar_config.json"
-callback_url = os.getenv("callback_url", "https://df1c-193-169-71-150.ngrok-free.app/webhook")
+callback_url = os.getenv("callback_url", "https://d777-2a0d-6fc0-2a60-4100-da3a-7c38-1c8a-bd8.ngrok-free.app/webhook")
 
 
 def create_data_export(record_id: str, foot_prints, resolution: float, domain: str):

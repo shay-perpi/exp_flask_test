@@ -11,7 +11,7 @@ import requests
 from flask.testing import FlaskClient
 from common.log import LoggerSingleton
 from common.config_file import raster_url, trigger_task_create, token, create_data_export, record_id, foot_print_demi, \
-    required_resolution, domain, foot_print_file, ca_file, path_download
+    required_resolution, domain, foot_print_file, ca_file, path_download, export_count
 
 logger = LoggerSingleton()
 time_keeper = TimeHandler()
@@ -92,10 +92,12 @@ def test_demi():
 
 
 def send_requests():
+    time_keeper.set_start_time()
+
     url_export = f"{raster_url}/{trigger_task_create}"
 
     print("send requests")
-    params = list_of_params_requests()
+    params = list_of_params_requests(export_count)
     for data in params:
         try:
             req = requests.post(url=url_export, data=data,
