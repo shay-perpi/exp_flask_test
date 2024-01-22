@@ -5,11 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2f5fdbf4-5d18-4610-926f-6bcabf1ff953" name="Changes" comment="adding ThreadPoolExecutor, delete clean logs , after requests">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/config_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/common/config_file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_export.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_export.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/time_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/time_handler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
