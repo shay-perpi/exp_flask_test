@@ -11,7 +11,7 @@ record_id = os.getenv("record_id", "dcf8f87e-f02d-4b7a-bf7b-c8b64b2d202a")
 trigger_task_create = os.getenv("trigger_task_create", "export-tasks")
 required_resolution = os.getenv("required_resolution", 0.0000013411)
 headers = os.getenv("headers", {"Content-Type": "application/json"})
-export_count = os.getenv("export_count", 8)
+export_count = os.getenv("export_count", 6)
 
 foot_print_file = os.getenv("foot_prints_file", "footprints.txt")
 path_dir = os.getenv("path_export_dir_raster")
