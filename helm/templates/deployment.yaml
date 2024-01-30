@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      terminationGracePeriodSeconds: 20
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: {{ .Values.pullSecretName }}
+      containers:
+        - name: {{ .Release.Name }}-container
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.containerPort }}
+          env:
+            - name: token
+              value: {{ .Values.envVariables.token | quote }}
+            - name: url
+              value: {{ .Values.envVariables.url | quote }}
+            - name: certification
+              value: {{ .Values.envVariables.certification | quote }}
+            - name: domain
+              value: {{ .Values.envVariables.domain | quote }}
+            - name: record_id
+              value: {{ .Values.envVariables.record_id | quote}}
+            - name: trigger_task_create
+              value: {{ .Values.envVariables.trigger_task_create | quote }}
+            - name: required_resolution
+              value: {{ .Values.envVariables.required_resolution | quote }}
+            - name: export_count
+              value: {{ .Values.envVariables.export_count | quote }}  
+            - name: foot_prints_file
+              value: {{ .Values.envVariables.foot_prints_file | quote }}
+            - name: path_to_products
+              value: {{ .Values.envVariables.path_to_products | quote }}
+            - name: image_name
+              value: {{ .Values.envVariables.image_name | quote }}
+            - name: logger_path
+              value: {{ .Values.envVariables.logger_path | quote }}       
+            - name: callback_url
+              value: {{ .Values.envVariables.callback_url | quote }}
+            - name: logger_name
+              value: {{ .Values.envVariables.logger_name }}                                                                                 
+          resources:
+            limits:
+              memory: 4000Mi
+              cpu: 4000m
+            requests:
+              memory: 2000Mi
+              cpu: 1000m
+          volumeMounts:
+            - name: pvc-data
+              mountPath: /opt/geoserver/data_dir/layerSources/automation/ #/opt/geoserver/data_dir/layerSources/automation
+              subPath: {{ .Values.subPathVolume }}
+      volumes:
+        - name: pvc-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.pvc.name }}

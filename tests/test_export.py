@@ -11,7 +11,7 @@ import requests
 from flask.testing import FlaskClient
 from common.log import LoggerSingleton
 from common.config_file import raster_url, trigger_task_create, token, create_data_export, record_id, foot_print_demi, \
-    required_resolution, domain, foot_print_file, ca_file, path_download, export_count
+    required_resolution, domain, foot_print_file, ca_file, path_download, export_count, token
 
 logger = LoggerSingleton()
 time_keeper = TimeHandler()
@@ -101,7 +101,7 @@ def send_requests():
     for data in params:
         try:
             req = requests.post(url=url_export, data=data,
-                                headers={"Content-Type": "application/json"})
+                                headers={"Content-Type": "application/json"}, verify=False)
             print(f"status: {req.status_code}\n  requets :{req.text} \n requests {req}")
             # response = json.loads(req.text)
             req.raise_for_status()  # Raise an exception for bad responses (4xx or 5xx)
@@ -161,8 +161,10 @@ class HandleCallback:
 
     def __test_status_api(self):
         logger.info(f"Enter test_status_api")
-
-        url_export_status = f"{raster_url}/{trigger_task_create}/{self.params['id']}"  # ?token={token}
+        if token:
+            url_export_status = f"{raster_url}/{trigger_task_create}/{self.params['id']}?token={token}"
+        else:
+            url_export_status = f"{raster_url}/{trigger_task_create}/{self.params['id']}"
         response = requests.get(url=url_export_status, headers={"Content-Type": "application/json"}, verify=False)
         response.raise_for_status()
         print(response.text)

@@ -1,0 +1,52 @@
+environment: raster-qa
+
+pvc:
+  name: local-sources-pvc
+
+containerPort: 8080
+service:
+  name: export-test-graph
+  port: 80
+  type: LoadBalancer  # or NodePort
+  targetPort: 5000
+
+envVariables:
+  token:
+  url: "https://export-management-export-management-route-no-auth-integration.apps.j1lk3njp.eastus.aroapp.io"
+  certification:
+  domain: RASTER
+  record_id: 'dcf8f87e-f02d-4b7a-bf7b-c8b64b2d202a'
+  trigger_task_create: "export-tasks"
+  required_resolution: 0.0000013411
+  export_count: 6
+  foot_prints_file: "/opt/geoserver/data_dir/layerSources/automation/export/footprints.txt" 
+  path_to_products: "/mnt/download"
+  image_name: "export_callback_graph.png"
+  logger_path: "/opt/geoserver/data_dir/layerSources/automation/Log"
+  callback_url: "http://export-test-route-raster-qa.apps.j1lk3njp.eastus.aroapp.io/webhook"
+  logger_name: "export-test"
+
+cloudProvider: azure
+pullSecretName: "acr-registry"
+
+image:
+  repository: acrarolibotnonprod.azurecr.io/automation/export-test-graph
+  tag: 1.7.3
+replicaCount: 1
+subPathVolume: export/
+serviceAccount:
+  create: true
+  name: eexport-test-graph
+
+ingress:
+  enabled: false
+  host: ""  # Set your desired host
+  path: /
+  annotations: {}
+
+route:
+  enabled: true
+  annotations: {}
+
+autoscaling:
+  enabled: false

@@ -2,6 +2,7 @@
 *.git
 *.tar
 *.log
+*.png
 *.json
 /venv
 playground.py
@@ -9,5 +10,4 @@ log/
 *.gpkg
 
 footprints.txt
-download\
-download
+/download

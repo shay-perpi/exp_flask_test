@@ -23,8 +23,9 @@ class TimeHandler:
     def get_current_time(self):
         current_time = datetime.now()
         return current_time.strftime(self.format)
+
     def set_start_time(self):
-        self.start_time =self.get_current_time()
+        self.start_time = self.get_current_time()
 
     def convert_to_datetime(self, time_string):
         return datetime.strptime(time_string, self.format)
@@ -42,27 +43,23 @@ class TimeHandler:
         current_time = self.get_current_time()
         self.time_memory[unique_id] = current_time
 
-    def calculate_difference_by_id(self, unique_id):
+    def save_time_response(self, unique_id):
         """
-        Calculate the time difference since the last time recorded for a given ID.
+        Calculate the time difference and store it in the dictionary.
         """
         if unique_id in self.time_memory:
             start_time = self.time_memory[unique_id]
-            end_time = self.get_current_time()
-            time_difference = self.calculate_time_difference(start_time, end_time)
-            return time_difference
+            current_time = self.get_current_time()
+            time_difference = self.calculate_time_difference(start_time, current_time)
+            self.time_memory[unique_id] = time_difference
         else:
-            return None
+            print(f"Error: ID '{unique_id}' not found in time_memory.")
 
     def build_memory_dict(self):
         """
         Build a dictionary containing IDs and their respective time differences.
         """
-        memory_dict = {}
-        for unique_id in self.time_memory:
-            time_difference = self.calculate_difference_by_id(unique_id)
-            memory_dict[unique_id] = time_difference
-        return memory_dict
+        return self.time_memory
 
     def get_start_time(self):
         """
