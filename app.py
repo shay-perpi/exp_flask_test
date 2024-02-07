@@ -7,7 +7,7 @@ from datetime import datetime
 from gunicorn.app.base import BaseApplication
 from flask import Flask, request, Response
 from tests.test_export import test_demi, send_requests, HandleCallback, logger, time_keeper
-from common.config_file import export_count, path_download, image_name,ca_file
+from common.config_file import export_count, path_download, image_name, ca_file
 import urllib3
 
 os.environ['MPLCONFIGDIR'] = path_download
@@ -118,7 +118,6 @@ def webhook():
 def home():
     print("Home")
     # test_demi()
-
     send_requests()
 
     return Response("Home Page - Test on air ")

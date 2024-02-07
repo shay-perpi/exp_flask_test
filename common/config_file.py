@@ -21,10 +21,9 @@ image_name = os.getenv("image_name", "export_callback_graph.png")
 path_log = os.getenv("logger_path", None) or "/home/shayperp/PycharmProjects/exp_flask_tes/log"
 logger_name = os.getenv("logger_name", "export-test")
 callback_url = os.getenv("callback_url", " https://c9c7-2a0d-6fc0-2a60-4100-6255-55cf-c73f-3fc5.ngrok-free.app/webhook")
-if token:
-    url_trigger = f"{raster_url}/{trigger_task_create}?token={token}"
-else:
-    url_trigger = f"{raster_url}/{trigger_task_create}"
+with_out_token = f"{raster_url}/{trigger_task_create}"
+with_token = f"{raster_url}/{trigger_task_create}?token={token}"
+url_trigger = with_token if token else with_out_token
 
 
 def create_data_export(record_id: str, foot_prints, resolution: float, domain: str):

@@ -11,7 +11,7 @@ import requests
 from flask.testing import FlaskClient
 from common.log import LoggerSingleton
 from common.config_file import raster_url, trigger_task_create, token, create_data_export, record_id, foot_print_demi, \
-    required_resolution, domain, foot_print_file, ca_file, path_download, export_count, token
+    required_resolution, domain, foot_print_file, ca_file, path_download, export_count, token, url_trigger
 
 logger = LoggerSingleton()
 time_keeper = TimeHandler()
@@ -21,7 +21,7 @@ def trigger_missing_params():
     print("Test missing_params")
 
     logger.info(f"Start {trigger_missing_params.__name__}")
-    url_export = f"{raster_url}/{trigger_task_create}?token={token}"
+    url_export = url_trigger
     trigger_params = create_data_export(record_id=record_id, foot_prints=foot_print_demi,
                                         resolution=required_resolution, domain=domain)
     trigger_params['catalogRecordID'] = ""
@@ -52,7 +52,7 @@ def trigger_missing_params():
 def trigger_invalid_params():
     print("invalid_params")
     logger.info(f"Start {trigger_invalid_params.__name__}")
-    url_export = f"{raster_url}/{trigger_task_create}?token={token}"
+    url_export = url_trigger
 
     trigger_params = create_data_export(record_id, foot_print_demi, required_resolution, domain=domain)
     trigger_params['catalogRecordID'] = "132456789789789"
@@ -94,7 +94,7 @@ def test_demi():
 def send_requests():
     time_keeper.set_start_time()
 
-    url_export = f"{raster_url}/{trigger_task_create}"
+    url_export = url_trigger
 
     print("send requests")
     params = list_of_params_requests(export_count)
@@ -112,10 +112,10 @@ def send_requests():
             logger.error(f"Error sending request {data}: {e}")
 
 
-def list_of_params_requests(export_count=1):
+def list_of_params_requests(export_count_e=1):
     list_of_params = []
     with open(foot_print_file, 'r') as file:
-        for i in range(export_count):
+        for i in range(export_count_e):
             foot_print = file.readline()
             foot_pr = ast.literal_eval(foot_print)
             param = create_data_export(record_id=record_id, foot_prints=foot_pr, resolution=required_resolution,
